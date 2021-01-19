@@ -1,11 +1,14 @@
 const express = require('express');
 const logger = require('morgan');
+
 const quotes = require('./routes/quotes');
 const users = require('./routes/users');
+const validate = require('./util/validation');
+
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const mongoose = require('./config/database'); //database configuration
-var jwt = require('jsonwebtoken');
+
 const app = express();
 require('dotenv').config()
 
@@ -21,22 +24,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // public route
-app.use('/users', users);
+app.use('/users', users.router);
+
+
 // private route
-app.use('/quotes', validateUser, quotes);
-
-function validateUser(req, res, next) {
-    jwt.verify(req.cookies.token, req.app.get('secretKey'), function (err, decoded) {
-        if (err) {
-            res.json({ status: "error", message: "Not Authorised", data: null });
-        } else {
-            // add user id to request
-            req.body.userId = decoded.id;
-            next();
-        }
-    });
-
-}
+app.use('/users', validate.validateUser, validate.validateAdmin, users.createRouter)
+app.use('/quotes', validate.validateUser, quotes);
 
 app.use(function (req, res, next) {
     let err = new Error('Not Found');

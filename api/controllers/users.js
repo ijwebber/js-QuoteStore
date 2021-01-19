@@ -29,7 +29,7 @@ function authenticate(req, res, next) {
                     next(err);
                 } else {
                     if (bcrypt.compareSync(req.body.password, userInfo.password)) {
-                        const token = jwt.sign({ id: userInfo._id }, req.app.get('secretKey'), { expiresIn: '3h' });
+                        const token = jwt.sign({ id: userInfo._id, admin: userInfo.admin }, req.app.get('secretKey'), { expiresIn: '3h' });
                         res.cookie("token", token, { httpOnly: true }).send({ status: "success" });
                     } else {
                         res.status(401).json({ status: "error", message: "Invalid email/password!", data: null });
