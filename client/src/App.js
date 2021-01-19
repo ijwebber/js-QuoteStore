@@ -1,21 +1,24 @@
+import { Route, Switch } from 'react-router';
+import { BrowserRouter } from 'react-router-dom';
 import './App.css';
+import Login from './components/Login';
+import Home from './components/Home';
+import { PrivateRoute, RestrictedRoute } from './components/SpecialRoutes';
+
 
 function App() {
+
+  const login = false;
+
   return (
     <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/Ap.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <BrowserRouter>
+        <Switch>
+          <PrivateRoute exact loggedIn={login} path="/" component={Home}></PrivateRoute>
+          <RestrictedRoute exact loggedIn={login} path="/login" component={Login} />
+        </Switch>
+      </BrowserRouter>
+
     </div>
   );
 }
